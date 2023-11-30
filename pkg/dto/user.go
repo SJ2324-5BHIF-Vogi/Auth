@@ -10,14 +10,14 @@ type UserDTO struct {
 	Username string `json:"username"`
 }
 
-func ModelToDto(user *domain.User) *UserDTO {
+func FromModel(user *domain.User) *UserDTO {
 	return &UserDTO{
 		ID:       user.ID.String(),
 		Username: user.Username,
 	}
 }
 
-func DtoFromModel(dto *UserDTO) (*domain.User, error) {
+func ToModel(dto *UserDTO) (*domain.User, error) {
 	id, err := uuid.Parse(dto.ID)
 
 	if err != nil {
