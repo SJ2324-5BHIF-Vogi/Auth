@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/SJ2324-5BHIF-Vogi/Auth/pkg/domain"
@@ -12,29 +13,43 @@ type UserUpdater struct {
 	repo repository.UserRepository
 
 	reader *UserReader
+
+	passwordReader *UserPasswordReader
 }
 
-func NewUserUpdater(r repository.UserRepository, reader *UserReader) *UserUpdater {
+func NewUserUpdater(r repository.UserRepository, reader *UserReader, passwordReader *UserPasswordReader) *UserUpdater {
 	return &UserUpdater{repo: r, reader: reader}
 }
 
 func (uu *UserUpdater) Update(ctx context.Context, id uuid.UUID, username string, password []byte) error {
+	// Check whether username or password should be updated.
+	if password == nil && username == "" {
+		return nil // TODO: return error (nothing to update)
+	}
+
 	// Check if user exists.
 	ex, err := uu.reader.Read(ctx, id)
 
-	if ex == nil {
-		return nil // TODO: return error
-	} else if err != nil {
+	if err != nil {
 		return err
+	} else if ex == nil {
+		return nil // TODO: return error
 	}
 
-	// Check whether username or password should be updated.
+	exp, err := uu.passwordReader.Read(ctx, id)
+
+	// Check if password should be updated.
+	if err != nil {
+		return err
+	} else if password == nil {
+		password = exp
+	} else if bytes.Equal(exp, password) { // Check if password is the same.
+		return nil // TODO: return error
+	}
+
+	// Check if username should be updated.
 	if username == "" {
 		username = ex.Username
-	} else if password == nil {
-		password = ex.Password
-	} else if password == nil && username == "" {
-		return nil // TODO: return error (nothing to update)
 	}
 
 	usr := domain.NewUser(username, password)
