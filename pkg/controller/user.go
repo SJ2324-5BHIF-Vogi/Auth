@@ -40,6 +40,13 @@ func NewUserController(creator userCreator, deleter userDeleter, reader userRead
 	return &UserController{creator: creator, deleter: deleter, reader: reader, updater: updater}
 }
 
+// GetUser retrieves a user by their ID.
+// It takes an echo.Context as a parameter and returns an error.
+// The function first parses the ID parameter from the request URL.
+// If the ID is not a valid UUID, it logs an error and returns the error.
+// Otherwise, it calls the Read method of the UserController's reader field to retrieve the user.
+// If an error occurs during the retrieval, it logs the error and returns it.
+// Finally, it returns the user as a JSON response with status code 200.
 func (uc *UserController) GetUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -60,6 +67,12 @@ func (uc *UserController) GetUser(c echo.Context) error {
 	return c.JSON(200, usr)
 }
 
+// CreateUser creates a new user.
+// It takes an echo.Context as a parameter and returns an error.
+// The function retrieves the username and password from the request form values.
+// It then calls the Create method of the UserController's creator field to create the user.
+// If an error occurs during the creation process, it logs the error using the echo.Context's logger.
+// After that, it returns a 201 status code with no content.
 func (uc *UserController) CreateUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -75,6 +88,11 @@ func (uc *UserController) CreateUser(c echo.Context) error {
 	return c.NoContent(201)
 }
 
+// DeleteUser deletes a user with the specified ID.
+// It takes an echo.Context as a parameter and returns an error.
+// The function first parses the ID parameter from the context and then calls the Delete method of the UserController's deleter field to delete the user.
+// If any error occurs during the parsing or deletion process, it logs the error and returns it.
+// Otherwise, it returns a 204 No Content response.
 func (uc *UserController) DeleteUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -93,6 +111,12 @@ func (uc *UserController) DeleteUser(c echo.Context) error {
 	return c.NoContent(204)
 }
 
+// UpdateUser updates a user's information.
+// It takes an echo.Context as a parameter and returns an error.
+// The function parses the user ID from the request parameter, retrieves the username and password from the form values,
+// hashes the password, and then calls the updater.Update method to update the user's information in the database.
+// If any error occurs during the process, it logs the error and returns it.
+// Otherwise, it returns a 204 No Content response.
 func (uc *UserController) UpdateUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
