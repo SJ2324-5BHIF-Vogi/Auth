@@ -84,7 +84,9 @@ func (ac *AuthController) Authenticate(e echo.Context) error {
 		return err
 	}
 
-	return e.String(200, tokenString)
+	return e.JSON(200, echo.Map{
+		"token": tokenString,
+	})
 }
 
 // Validate validates the token received from the client.
